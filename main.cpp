@@ -2,8 +2,13 @@
 #include <string>
 #include <windows.h>
 #include <time.h>
+#include <sstream>
+#include <stdlib.h>
 
 using namespace std;
+
+const int NUMBER_STOCKS = 6;
+const int NUMBER_SPACES = 40;
 
 // Stores command values
 string command = "";
@@ -32,6 +37,9 @@ enum stockNames{
   GRAIN
 };
 
+// Settinsg
+bool showBoard = true;
+
 // Windows Stuff for colours
 HANDLE  hConsole;
 
@@ -41,6 +49,13 @@ int random(int newLowest, int newHighest){
   int range = (highest - lowest) + 1;
   int randomNumber = lowest+int(range*rand()/(RAND_MAX + 1.0));
   return randomNumber;
+}
+
+//Convert int to string
+string convertIntToString(int number){
+  stringstream ss;
+  ss << number;
+  return ss.str();
 }
 
 // Init
@@ -55,7 +70,7 @@ void init(){
   cout << "Welcome to stock ticker!\n\n Use HELP to get started\n";
 
   // Init stocks
-  for( int i = 0; i < 6; i ++){
+  for( int i = 0; i < NUMBER_STOCKS; i ++){
     stocks[i].pos = 1000;
     stocks[i].owned = 0;
 
@@ -104,39 +119,78 @@ void init(){
   money = 5000;
 }
 
-// Roll dice
+// Draw board
+void draw_board(){
+  // First line
+  cout << "     +                                      -\n";
+  // Display each position
+  for( int i = 0; i < NUMBER_STOCKS; i++){
+    for( int t = NUMBER_SPACES; t > 0; t--){
+      // First part of line
+      if( t >= NUMBER_SPACES){
+        // Stocks custom colour
+        SetConsoleTextAttribute( hConsole, stocks[i].colour );
+        // Name
+        cout << stocks[i].name;
+      }
 
+      // X represents place on board
+      if( stocks[i].pos / 50 == t){
+        cout << "X";
+      }
+      else{
+        cout << "=";
+      }
+      // Divider
+      if( t == NUMBER_SPACES/2 + 1)
+        cout << "|";
+      // Newline
+      if( t == 1)
+        cout << "\n";
+    }
+  }
+  // Back to default colour
+  SetConsoleTextAttribute( hConsole, 0x07 );
+}
 
 // Main game
 void game(){
   // Get a command
   cin >> command;
 
+  // Clear console after command
+  system("cls");
+
+  // Message every time round
+  cout << "STOCK TICKER: type HELP for commands\n\n";
+
   // Check command
   if( command == "HELP"){
-    cout << " HELP:displays the help menu\n"
-         << " BUY: Buys the specified amount of the specified stock\n"
-         << " SELL: Sells the specified amount of the specified stock\n"
-         << " STOCKS: Lists available stocks and the values\n"
-         << " INV: View all money and stocks you own\n"
-         << " BOARD: View game board visual\n"
-         << " ROLL: Rolls the dice (ends turn)\n";
+    cout << "HELP:displays the help menu\n"
+         << "BUY: Buys the specified amount of the specified stock\n"
+         << "SELL: Sells the specified amount of the specified stock\n"
+         << "STOCKS: Lists available stocks and the values\n"
+         << "INV: View all money and stocks you own\n"
+         << "BOARD: View game board visual\n"
+         << "ROLL: Rolls the dice (ends turn)\n"
+         << "SETTINGS: Change settings \n\n"
+         << "TIP: Use the up arrow to access last command. \n Also, enter commands separated by spaces to enter multiple. \n For example, in they buy menu, when buying 1000 \n shares of gold instead of doing \n BUY [enter] 1 [enter] 1 [enter], \n you can simply do BUY 1 1 [ENTER].\n";
   }
   else if( command == "BUY"){
     // Store number
     int command_int = 0;
     int command_int2 = 0;
 
-    cout << " What would you like to buy? (number value) You have $" << money
-         << "\n  1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
-         << "\n  2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
-         << "\n  3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
-         << "\n  4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
-         << "\n  5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
-         << "\n  6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
+    cout << "What would you like to buy? (number value) You have $" << money
+         << "\n 1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
+         << "\n 2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
+         << "\n 3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
+         << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
+         << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
+         << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
     cin >> command_int;
 
-    cout << "Ok, how many shares (in 1000's)?:";
+    cout << "Ok, how many shares (in 1000's)?: ";
     cin >> command_int2;
 
     // Check moneys
@@ -144,10 +198,10 @@ void game(){
     if( stocks[command_int].pos * command_int2 <= money){
       money -= stocks[command_int].pos * command_int2;
       stocks[command_int].owned += command_int2;
-      cout << command_int2 * 1000 << " shares bought\n";
+      cout << "\n" << command_int2 * 1000 << " shares bought\n";
     }
     else{
-      cout << "Not enought money to buy " << command_int2 * 1000 << " shares.\n";
+      cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
     }
   }
   else if( command == "SELL"){
@@ -155,16 +209,16 @@ void game(){
     int command_int = 0;
     int command_int2 = 0;
 
-    cout << " What would you like to sell? (number value) You have $" << money
-         << "\n  1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
-         << "\n  2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
-         << "\n  3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
-         << "\n  4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
-         << "\n  5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
-         << "\n  6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
+    cout << "What would you like to sell? (number value) You have $" << money
+         << "\n 1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
+         << "\n 2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
+         << "\n 3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
+         << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
+         << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
+         << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
     cin >> command_int;
 
-    cout << "Ok, how many shares? (in 1000's)";
+    cout << "Ok, how many shares? (in 1000's): ";
     cin >> command_int2;
 
     // Check moneys
@@ -172,15 +226,16 @@ void game(){
     if( command_int2 <= stocks[command_int].owned){
       money += stocks[command_int].pos * command_int2;
       stocks[command_int].owned -= command_int2;
-      cout << command_int2 * 1000 << " shares sold\n";
+      cout << "\n" << command_int2 * 1000 << " shares sold\n";
     }
     else{
-      cout << "Not enought stocks to sell " << command_int2 * 1000 << " shares.\n";
+      cout << "\nNot enought stocks to sell " << command_int2 * 1000 << " shares.\n";
     }
   }
   // Stock Prices
   else if( command == "STOCKS"){
-    cout << " GOLD: $" << stocks[0].pos << "\n"
+    cout << "Prices:\n"
+         << " GOLD: $" << stocks[0].pos << "\n"
          << " SILVER: $" << stocks[1].pos << "\n"
          << " OIL: $" << stocks[2].pos << "\n"
          << " BONDS: $" << stocks[3].pos << "\n"
@@ -189,57 +244,90 @@ void game(){
   }
   // Views stocks and money
   else if( command == "INV"){
-    cout << " You have $" << money
-         << "\n  GOLD: " << stocks[0].owned << " shares"
-         << "\n  SILVER: " << stocks[1].owned << " shares"
-         << "\n  OIL: " << stocks[2].owned << " shares"
-         << "\n  BONDS: " << stocks[3].owned << " shares"
-         << "\n  INDUSTRIAL: " << stocks[4].owned << " shares"
-         << "\n  GRAIN: " << stocks[5].owned << " shares\n";
+    cout << "You have $" << money
+         << "\n GOLD: " << stocks[0].owned << " shares"
+         << "\n SILVER: " << stocks[1].owned << " shares"
+         << "\n OIL: " << stocks[2].owned << " shares"
+         << "\n BONDS: " << stocks[3].owned << " shares"
+         << "\n INDUSTRIAL: " << stocks[4].owned << " shares"
+         << "\n GRAIN: " << stocks[5].owned << " shares\n";
   }
   // Basic board layout
   else if( command == "BOARD"){
-    // First line
-    cout << "     +                                      -\n";
-    // Display each position
-    for( int i = 0; i < 6; i++){
-      for( int t = 40; t > 0; t--){
-        // First part of line
-        if( t >= 40){
-          // Stocks custom colour
-          SetConsoleTextAttribute( hConsole, stocks[i].colour );
-          // Name
-          cout << stocks[i].name;
-        }
-
-        // X represents place on board
-        if( stocks[i].pos / 50 == t){
-          cout << "X";
-        }
-        else{
-          cout << "=";
-        }
-        // Newline
-        if( t <= 1)
-          cout << "\n";
-      }
-    }
-    // Back to default colour
-    SetConsoleTextAttribute( hConsole, 0x07 );
+    // We got a seperate function for that
+    draw_board();
   }
   // Roll the dice
   else if( command == "ROLL"){
+    // Output string
+    string rollOutput = "";
+
+    // DIE 1
     // Random stock select
-    int stockSelected = random( 0, 5);
+    int dieStock = random( 0, 5);
+    rollOutput += stocks[dieStock].fullName;
 
-    // Amount moved
-    int movement = random( -4, 4) * 50;
+    // DIE 2
+    // Command 0 = div, 1 = up, 2 = down
+    int dieCommand = random( 0, 2);
 
-    // Move it
-    stocks[stockSelected].pos += movement;
+    // DIE 3
+    // Number
+    int dieAmount = random( 1, 4);
+
+    // Commands
+    switch (dieCommand){
+      // Pay dividends
+      case 0:{
+        if( stocks[dieStock].pos > 1000){
+          // Calc money made
+          int divAmount = (stocks[dieStock].pos * (dieAmount * 5) * stocks[dieStock].owned)/ 100;
+          money += divAmount;
+          rollOutput += " DIV %" + convertIntToString(dieAmount * 5) + ".\n";
+          rollOutput += " $" + convertIntToString(divAmount) + " added to your inventory";
+        }
+        else{
+          rollOutput += " is under par, could not pay dividends.";
+        }
+        break;
+      }
+      // Move up
+      case 1:
+        stocks[dieStock].pos += dieAmount * 50;
+        rollOutput += " UP " + convertIntToString(dieAmount * 50);
+        break;
+      // Move down
+      case 2:
+        stocks[dieStock].pos -= dieAmount * 50;
+        rollOutput += " DOWN " + convertIntToString(dieAmount * 50);
+        break;
+      default:
+        break;
+    }
+
+    // Show board if needed
+    if( showBoard)
+      draw_board();
 
     // What happened?
-    cout << stocks[stockSelected].fullName << " moved " << movement << ".\n";
+    cout << rollOutput << ".\n";
+  }
+  // Toggle settings
+  else if( command == "SETTINGS"){
+    // Available toggles
+    int command_int = 0;
+
+    cout << "1. Toggle showing board after each roll (" << showBoard << ")\n";
+    cin >> command_int;
+
+    // Setting to change
+    switch (command_int){
+      case 1:
+        showBoard = !showBoard;
+        break;
+      default:
+        break;
+    }
   }
   else if( command == "EXIT"){
     game_running = false;

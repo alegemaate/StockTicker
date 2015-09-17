@@ -5,3 +5,11 @@
 	<windows.h>
 	<time.h>
 
+1442463971 source:c:\users\allan\documents\games indev\stockticker\main.cpp
+	<iostream>
+	<string>
+	<windows.h>
+	<time.h>
+	<sstream>
+	<stdlib.h>
+
