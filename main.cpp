@@ -58,6 +58,24 @@ string convertIntToString(int number){
   return ss.str();
 }
 
+//Convert string to int
+int convertStringToInt(string newString){
+  int result;
+  stringstream(newString) >> result;
+  return result;
+}
+
+// Check if string is int
+inline bool isInteger(const std::string & s){
+  if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+')))
+    return false;
+
+  char * p;
+  strtol(s.c_str(), &p, 10);
+
+  return (*p == 0);
+}
+
 // Init
 void init(){
   // New random generator
@@ -178,6 +196,8 @@ void game(){
   }
   else if( command == "BUY" || command == "buy"){
     // Store number
+    string command_int_s = "";
+    string command_int2_s = "";
     int command_int = 0;
     int command_int2 = 0;
 
@@ -188,24 +208,35 @@ void game(){
          << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
          << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
          << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
-    cin >> command_int;
+    cin >> command_int_s;
 
     cout << "Ok, how many shares (in 1000's)?: ";
-    cin >> command_int2;
+    cin >> command_int2_s;
 
-    // Check moneys
-    command_int --;
-    if( stocks[command_int].pos * command_int2 <= money){
-      money -= stocks[command_int].pos * command_int2;
-      stocks[command_int].owned += command_int2;
-      cout << "\n" << command_int2 * 1000 << " shares bought\n";
+    // Validate
+    if( isInteger(command_int_s) && isInteger(command_int2_s)){
+      command_int = convertStringToInt(command_int_s);
+      command_int2 = convertStringToInt(command_int2_s);
+
+      // Check moneys
+      command_int --;
+      if( stocks[command_int].pos * command_int2 <= money){
+        money -= stocks[command_int].pos * command_int2;
+        stocks[command_int].owned += command_int2;
+        cout << "\n" << command_int2 * 1000 << " shares bought\n";
+      }
+      else{
+        cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
+      }
     }
     else{
-      cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
+      cout << "Only use numbers.\n";
     }
   }
   else if( command == "SELL" || command == "sell"){
     // Store number
+    string command_int_s = "";
+    string command_int2_s = "";
     int command_int = 0;
     int command_int2 = 0;
 
@@ -216,20 +247,29 @@ void game(){
          << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
          << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
          << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
-    cin >> command_int;
+    cin >> command_int_s;
 
     cout << "Ok, how many shares? (in 1000's): ";
-    cin >> command_int2;
+    cin >> command_int2_s;
 
-    // Check moneys
-    command_int --;
-    if( command_int2 <= stocks[command_int].owned){
-      money += stocks[command_int].pos * command_int2;
-      stocks[command_int].owned -= command_int2;
-      cout << "\n" << command_int2 * 1000 << " shares sold\n";
+    // Validate
+    if( isInteger(command_int_s) && isInteger(command_int2_s)){
+      command_int = convertStringToInt(command_int_s);
+      command_int2 = convertStringToInt(command_int2_s);
+
+      // Check moneys
+      command_int --;
+      if( command_int2 <= stocks[command_int].owned){
+        money += stocks[command_int].pos * command_int2;
+        stocks[command_int].owned -= command_int2;
+        cout << "\n" << command_int2 * 1000 << " shares sold\n";
+      }
+      else{
+        cout << "\nNot enought stocks to sell " << command_int2 * 1000 << " shares.\n";
+      }
     }
     else{
-      cout << "\nNot enought stocks to sell " << command_int2 * 1000 << " shares.\n";
+      cout << "Only use numbers.\n";
     }
   }
   // Stock Prices
@@ -338,13 +378,18 @@ void game(){
     switch (command_int){
       case 1:
         showBoard = !showBoard;
+        cout << "Show board toggled!\n";
         break;
       default:
+        cout << "Not a valid option. Try again.\n";
         break;
     }
   }
   else if( command == "EXIT" || command == "exit"){
     game_running = false;
+  }
+  else{
+    cout << command << " is not a valid command. Use HELP to view available commands.\n";
   }
 }
 
