@@ -85,7 +85,7 @@ void init(){
   hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
   // Welcome message
-  cout << "Welcome to stock ticker!\n\n Use HELP to get started\n";
+  cout << "Welcome to stock ticker v1.06!\n\n Use HELP to get started\n";
 
   // Init stocks
   for( int i = 0; i < NUMBER_STOCKS; i ++){
