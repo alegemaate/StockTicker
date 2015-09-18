@@ -165,7 +165,7 @@ void game(){
   cout << "STOCK TICKER: type HELP for commands\n\n";
 
   // Check command
-  if( command == "HELP"){
+  if( command == "HELP" || command == "help"){
     cout << "HELP:displays the help menu\n"
          << "BUY: Buys the specified amount of the specified stock\n"
          << "SELL: Sells the specified amount of the specified stock\n"
@@ -176,7 +176,7 @@ void game(){
          << "SETTINGS: Change settings \n\n"
          << "TIP: Use the up arrow to access last command. \n Also, enter commands separated by spaces to enter multiple. \n For example, in they buy menu, when buying 1000 \n shares of gold instead of doing \n BUY [enter] 1 [enter] 1 [enter], \n you can simply do BUY 1 1 [ENTER].\n";
   }
-  else if( command == "BUY"){
+  else if( command == "BUY" || command == "buy"){
     // Store number
     int command_int = 0;
     int command_int2 = 0;
@@ -204,7 +204,7 @@ void game(){
       cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
     }
   }
-  else if( command == "SELL"){
+  else if( command == "SELL" || command == "sell"){
     // Store number
     int command_int = 0;
     int command_int2 = 0;
@@ -233,7 +233,7 @@ void game(){
     }
   }
   // Stock Prices
-  else if( command == "STOCKS"){
+  else if( command == "STOCKS" || command == "stocks"){
     cout << "Prices:\n"
          << " GOLD: $" << stocks[0].pos << "\n"
          << " SILVER: $" << stocks[1].pos << "\n"
@@ -243,7 +243,7 @@ void game(){
          << " GRAIN: $" << stocks[5].pos << "\n";
   }
   // Views stocks and money
-  else if( command == "INV"){
+  else if( command == "INV" || command == "inv"){
     cout << "You have $" << money
          << "\n GOLD: " << stocks[0].owned << " shares"
          << "\n SILVER: " << stocks[1].owned << " shares"
@@ -253,12 +253,12 @@ void game(){
          << "\n GRAIN: " << stocks[5].owned << " shares\n";
   }
   // Basic board layout
-  else if( command == "BOARD"){
+  else if( command == "BOARD" || command == "board"){
     // We got a seperate function for that
     draw_board();
   }
   // Roll the dice
-  else if( command == "ROLL"){
+  else if( command == "ROLL" || command == "roll"){
     // Output string
     string rollOutput = "";
 
@@ -281,7 +281,7 @@ void game(){
       case 0:{
         if( stocks[dieStock].pos > 1000){
           // Calc money made
-          int divAmount = (stocks[dieStock].pos * (dieAmount * 5) * stocks[dieStock].owned)/ 100;
+          int divAmount = (dieAmount * 50) * stocks[dieStock].owned;
           money += divAmount;
           rollOutput += " DIV %" + convertIntToString(dieAmount * 5) + ".\n";
           rollOutput += " $" + convertIntToString(divAmount) + " added to your inventory";
@@ -313,7 +313,7 @@ void game(){
     cout << rollOutput << ".\n";
   }
   // Toggle settings
-  else if( command == "SETTINGS"){
+  else if( command == "SETTINGS" || command == "settings"){
     // Available toggles
     int command_int = 0;
 
@@ -329,7 +329,7 @@ void game(){
         break;
     }
   }
-  else if( command == "EXIT"){
+  else if( command == "EXIT" || command == "exit"){
     game_running = false;
   }
 }
