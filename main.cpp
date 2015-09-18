@@ -295,11 +295,25 @@ void game(){
       case 1:
         stocks[dieStock].pos += dieAmount * 50;
         rollOutput += " UP " + convertIntToString(dieAmount * 50);
+
+        // Off track
+        if( stocks[dieStock].pos >= 2000){
+          stocks[dieStock].pos = 1000;
+          rollOutput += " and SPLIT. You get " + convertIntToString(stocks[dieStock].owned) + " free shares :D";
+          stocks[dieStock].owned *= 2;
+        }
         break;
       // Move down
       case 2:
         stocks[dieStock].pos -= dieAmount * 50;
         rollOutput += " DOWN " + convertIntToString(dieAmount * 50);
+
+        // Off track
+        if( stocks[dieStock].pos <= 0){
+          stocks[dieStock].pos = 1000;
+          rollOutput += " and CRASHES. You lose " + convertIntToString(stocks[dieStock].owned) + " shares :(";
+          stocks[dieStock].owned = 0;
+        }
         break;
       default:
         break;
