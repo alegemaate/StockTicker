@@ -5,13 +5,11 @@
 #include <sstream>
 #include <stdlib.h>
 
-using namespace std;
-
 const int NUMBER_STOCKS = 6;
 const int NUMBER_SPACES = 40;
 
 // Stores command values
-string command = "";
+std::string command = "";
 
 // Game running? (for exit)
 bool game_running = true;
@@ -24,18 +22,10 @@ struct stock{
   int pos;
   int owned;
   int colour;
-  string name;
-  string fullName;
+  std::string name;
+  std::string shortName;
+  std::string fullName;
 }stocks[6];
-
-enum stockNames{
-  GOLD,
-  SILVER,
-  OIL,
-  BONDS,
-  INDUSTRIAL,
-  GRAIN
-};
 
 // Settinsg
 bool showBoard = true;
@@ -52,16 +42,16 @@ int random(int newLowest, int newHighest){
 }
 
 //Convert int to string
-string convertIntToString(int number){
-  stringstream ss;
+std::string convertIntToString(int number){
+  std::stringstream ss;
   ss << number;
   return ss.str();
 }
 
 //Convert string to int
-int convertStringToInt(string newString){
+int convertStringToInt(std::string newString){
   int result;
-  stringstream(newString) >> result;
+  std::stringstream(newString) >> result;
   return result;
 }
 
@@ -85,7 +75,7 @@ void init(){
   hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
   // Welcome message
-  cout << "Welcome to stock ticker v1.06!\n\n Use HELP to get started\n";
+  std::cout << "Welcome to stock ticker v1.07!\n\n Use HELP to get started\n";
 
   // Init stocks
   for( int i = 0; i < NUMBER_STOCKS; i ++){
@@ -94,40 +84,47 @@ void init(){
 
     // Stock colours
     switch (i){
-      case GOLD:
+      case 0:
         stocks[i].colour = 0x06;
         stocks[i].name = "GLD. ";
-        stocks[i].fullName = "Gold";
+        stocks[i].shortName = "gld";
+        stocks[i].fullName = "GOLD";
         break;
-      case SILVER:
+      case 1:
         stocks[i].colour = 0x0F;
-        stocks[i].name = "SLV. ";
-        stocks[i].fullName = "Silver";
+        stocks[i].name = "SIL. ";
+        stocks[i].shortName = "sil";
+        stocks[i].fullName = "SILVER";
         break;
-      case OIL:
+      case 2:
         stocks[i].colour = 0x0C;
+        stocks[i].shortName = "oil";
         stocks[i].name = "OIL. ";
-        stocks[i].fullName = "Oil";
+        stocks[i].fullName = "OIL";
         break;
-      case BONDS:
+      case 3:
         stocks[i].colour = 0x0A;
+        stocks[i].shortName = "bnd";
         stocks[i].name = "BND. ";
-        stocks[i].fullName = "Bonds";
+        stocks[i].fullName = "BONDS";
         break;
-      case INDUSTRIAL:
+      case 4:
         stocks[i].colour = 0x0D;
         stocks[i].name = "IND. ";
-        stocks[i].fullName = "Industrial";
+        stocks[i].shortName = "ind";
+        stocks[i].fullName = "INDUSTRIAL";
         break;
-      case GRAIN:
+      case 5:
         stocks[i].colour = 0x0E;
-        stocks[i].name = "GRN. ";
-        stocks[i].fullName = "Grain";
+        stocks[i].name = "GRA. ";
+        stocks[i].shortName = "gra";
+        stocks[i].fullName = "GRAIN";
         break;
       default:
         stocks[i].colour = 0x07;
         stocks[i].name = "NNE.";
-        stocks[i].fullName = "None";
+        stocks[i].shortName = "non";
+        stocks[i].fullName = "NONE";
         break;
     }
 
@@ -140,7 +137,7 @@ void init(){
 // Draw board
 void draw_board(){
   // First line
-  cout << "     +                                      -\n";
+  std::cout << "     +                                      -\n";
   // Display each position
   for( int i = 0; i < NUMBER_STOCKS; i++){
     for( int t = NUMBER_SPACES; t > 0; t--){
@@ -149,22 +146,22 @@ void draw_board(){
         // Stocks custom colour
         SetConsoleTextAttribute( hConsole, stocks[i].colour );
         // Name
-        cout << stocks[i].name;
+        std::cout << stocks[i].name;
       }
 
       // X represents place on board
       if( stocks[i].pos / 50 == t){
-        cout << "X";
+        std::cout << "X";
       }
       else{
-        cout << "=";
+        std::cout << "=";
       }
       // Divider
       if( t == NUMBER_SPACES/2 + 1)
-        cout << "|";
+        std::cout << "|";
       // Newline
       if( t == 1)
-        cout << "\n";
+        std::cout << "\n";
     }
   }
   // Back to default colour
@@ -174,44 +171,44 @@ void draw_board(){
 // Main game
 void game(){
   // Get a command
-  cin >> command;
+  std::cin >> command;
 
   // Clear console after command
   system("cls");
 
   // Message every time round
-  cout << "STOCK TICKER: type HELP for commands\n\n";
+  std::cout << "STOCK TICKER: type HELP for commands\n\n";
 
   // Check command
   if( command == "HELP" || command == "help"){
-    cout << "HELP:displays the help menu\n"
-         << "BUY: Buys the specified amount of the specified stock\n"
-         << "SELL: Sells the specified amount of the specified stock\n"
-         << "STOCKS: Lists available stocks and the values\n"
-         << "INV: View all money and stocks you own\n"
-         << "BOARD: View game board visual\n"
-         << "ROLL: Rolls the dice (ends turn)\n"
-         << "SETTINGS: Change settings \n\n"
-         << "TIP: Use the up arrow to access last command. \n Also, enter commands separated by spaces to enter multiple. \n For example, in they buy menu, when buying 1000 \n shares of gold instead of doing \n BUY [enter] 1 [enter] 1 [enter], \n you can simply do BUY 1 1 [ENTER].\n";
+    std::cout << "HELP:displays the help menu\n"
+              << "BUY: Buys the specified amount of the specified stock\n"
+              << "SELL: Sells the specified amount of the specified stock\n"
+              << "STOCKS: Lists available stocks and the values\n"
+              << "INV: View all money and stocks you own\n"
+              << "BOARD: View game board visual\n"
+              << "ROLL: Rolls the dice (ends turn)\n"
+              << "SETTINGS: Change settings \n\n"
+              << "TIP: Use the up arrow to access last command. \n Also, enter commands separated by spaces to enter multiple. \n For example, in they buy menu, when buying 1000 \n shares of gold instead of doing \n BUY [enter] 1 [enter] 1 [enter], \n you can simply do BUY 1 1 [ENTER].\n";
   }
   else if( command == "BUY" || command == "buy"){
     // Store number
-    string command_int_s = "";
-    string command_int2_s = "";
+    std::string command_int_s = "";
+    std::string command_int2_s = "";
     int command_int = 0;
     int command_int2 = 0;
 
-    cout << "What would you like to buy? (number value) You have $" << money
-         << "\n 1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
-         << "\n 2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
-         << "\n 3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
-         << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
-         << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
-         << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
-    cin >> command_int_s;
+    std::cout << "What would you like to buy? (number value) You have $" << money
+              << "\n 1." << stocks[0].fullName << "(" << stocks[0].owned << ") $" << stocks[0].pos
+              << "\n 2." << stocks[1].fullName << "(" << stocks[1].owned << ") $" << stocks[1].pos
+              << "\n 3." << stocks[2].fullName << "(" << stocks[2].owned << ") $" << stocks[2].pos
+              << "\n 4." << stocks[3].fullName << "(" << stocks[3].owned << ") $" << stocks[3].pos
+              << "\n 5." << stocks[4].fullName << "(" << stocks[4].owned << ") $" << stocks[4].pos
+              << "\n 6." << stocks[5].fullName << "(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
+    std::cin >> command_int_s;
 
-    cout << "Ok, how many shares (in 1000's)?:\n";
-    cin >> command_int2_s;
+    std::cout << "Ok, how many shares (in 1000's)?:\n";
+    std::cin >> command_int2_s;
 
     // Validate
     if( isInteger(command_int_s) && isInteger(command_int2_s)){
@@ -223,34 +220,34 @@ void game(){
       if( stocks[command_int].pos * command_int2 <= money){
         money -= stocks[command_int].pos * command_int2;
         stocks[command_int].owned += command_int2;
-        cout << command_int2 * 1000 << " shares bought\n";
+        std::cout << command_int2 * 1000 << " shares bought\n";
       }
       else{
-        cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
+        std::cout << "\nNot enought money to buy " << command_int2 * 1000 << " shares.\n";
       }
     }
     else{
-      cout << "Only use numbers.\n";
+      std::cout << "Only use numbers.\n";
     }
   }
   else if( command == "SELL" || command == "sell"){
     // Store number
-    string command_int_s = "";
-    string command_int2_s = "";
+    std::string command_int_s = "";
+    std::string command_int2_s = "";
     int command_int = 0;
     int command_int2 = 0;
 
-    cout << "What would you like to sell? (number value) You have $" << money
-         << "\n 1.GOLD(" << stocks[0].owned << ") $" << stocks[0].pos
-         << "\n 2.SILVER(" << stocks[1].owned << ") $" << stocks[1].pos
-         << "\n 3.OIL(" << stocks[2].owned << ") $" << stocks[2].pos
-         << "\n 4.BONDS(" << stocks[3].owned << ") $" << stocks[3].pos
-         << "\n 5.INDUSTRIAL(" << stocks[4].owned << ") $" << stocks[4].pos
-         << "\n 6.GRAIN(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
-    cin >> command_int_s;
+    std::cout << "What would you like to sell? (number value) You have $" << money
+              << "\n 1." << stocks[0].fullName << "(" << stocks[0].owned << ") $" << stocks[0].pos
+              << "\n 2." << stocks[1].fullName << "(" << stocks[1].owned << ") $" << stocks[1].pos
+              << "\n 3." << stocks[2].fullName << "(" << stocks[2].owned << ") $" << stocks[2].pos
+              << "\n 4." << stocks[3].fullName << "(" << stocks[3].owned << ") $" << stocks[3].pos
+              << "\n 5." << stocks[4].fullName << "(" << stocks[4].owned << ") $" << stocks[4].pos
+              << "\n 6." << stocks[5].fullName << "(" << stocks[5].owned << ") $" << stocks[5].pos << "\n";
+    std::cin >> command_int_s;
 
-    cout << "Ok, how many shares? (in 1000's):\n";
-    cin >> command_int2_s;
+    std::cout << "Ok, how many shares? (in 1000's):\n";
+    std::cin >> command_int2_s;
 
     // Validate
     if( isInteger(command_int_s) && isInteger(command_int2_s)){
@@ -262,35 +259,35 @@ void game(){
       if( command_int2 <= stocks[command_int].owned){
         money += stocks[command_int].pos * command_int2;
         stocks[command_int].owned -= command_int2;
-        cout << command_int2 * 1000 << " shares sold\n";
+        std::cout << command_int2 * 1000 << " shares sold\n";
       }
       else{
-        cout << "\nNot enought stocks to sell " << command_int2 * 1000 << " shares.\n";
+        std::cout << "\nNot enought stocks to sell " << command_int2 * 1000 << " shares.\n";
       }
     }
     else{
-      cout << "Only use numbers.\n";
+      std::cout << "Only use numbers.\n";
     }
   }
   // Stock Prices
   else if( command == "STOCKS" || command == "stocks"){
-    cout << "Prices:\n"
-         << " GOLD: $" << stocks[0].pos << "\n"
-         << " SILVER: $" << stocks[1].pos << "\n"
-         << " OIL: $" << stocks[2].pos << "\n"
-         << " BONDS: $" << stocks[3].pos << "\n"
-         << " INDUSTRIAL: $" << stocks[4].pos << "\n"
-         << " GRAIN: $" << stocks[5].pos << "\n";
+    std::cout << "Prices:\n"
+              << " GOLD: $" << stocks[0].pos << "\n"
+              << " SILVER: $" << stocks[1].pos << "\n"
+              << " OIL: $" << stocks[2].pos << "\n"
+              << " BONDS: $" << stocks[3].pos << "\n"
+              << " INDUSTRIAL: $" << stocks[4].pos << "\n"
+              << " GRAIN: $" << stocks[5].pos << "\n";
   }
   // Views stocks and money
   else if( command == "INV" || command == "inv"){
-    cout << "You have $" << money
-         << "\n GOLD: " << stocks[0].owned << " shares"
-         << "\n SILVER: " << stocks[1].owned << " shares"
-         << "\n OIL: " << stocks[2].owned << " shares"
-         << "\n BONDS: " << stocks[3].owned << " shares"
-         << "\n INDUSTRIAL: " << stocks[4].owned << " shares"
-         << "\n GRAIN: " << stocks[5].owned << " shares\n";
+    std::cout << "You have $" << money
+              << "\n GOLD: " << stocks[0].owned << " shares"
+              << "\n SILVER: " << stocks[1].owned << " shares"
+              << "\n OIL: " << stocks[2].owned << " shares"
+              << "\n BONDS: " << stocks[3].owned << " shares"
+              << "\n INDUSTRIAL: " << stocks[4].owned << " shares"
+              << "\n GRAIN: " << stocks[5].owned << " shares\n";
   }
   // Basic board layout
   else if( command == "BOARD" || command == "board"){
@@ -300,7 +297,7 @@ void game(){
   // Roll the dice
   else if( command == "ROLL" || command == "roll"){
     // Output string
-    string rollOutput = "";
+    std::string rollOutput = "";
 
     // DIE 1
     // Random stock select
@@ -364,35 +361,35 @@ void game(){
       draw_board();
 
     // What happened?
-    cout << rollOutput << ".\n";
+    std::cout << rollOutput << ".\n";
   }
   // Toggle settings
   else if( command == "SETTINGS" || command == "settings"){
     // Available toggles
     int command_int = 0;
 
-    cout << "1. Toggle showing board after each roll (" << showBoard << ")\n";
-    cin >> command_int;
+    std::cout << "1. Toggle showing board after each roll (" << showBoard << ")\n";
+    std::cin >> command_int;
 
     // Setting to change
     switch (command_int){
       case 1:
         showBoard = !showBoard;
-        cout << "Show board toggled!\n";
+        std::cout << "Show board toggled!\n";
         break;
       default:
-        cout << "Not a valid option. Try again.\n";
+        std::cout << "Not a valid option. Try again.\n";
         break;
     }
   }
   else if( command == "SWAG" || command == "swag"){
-    cout << "'''''''''''+++@@@@@@+++@@@@@@@++''''''''\n'''''''''''+++@@@@@@+++@@@@@@@++''''''''\n''''''''@@@@@@@+++++++++++++@@@@@@''''''\n''''''@@@@++++++++++++++++++++++@@@@''''\n''''@@@++++++++++++++++++++++++++++@''''\n''''@@@++++++++++++++++++++++++++++@''''\n'''@@@+++++++++++++++++++++++++++++@@@@'\n''@@++++++++++++++++++++++++++++++++++@@\n@@@++++++++++++'++.........'+++++++++++@\n@@@++++++++++++'++.........'+++++++++++@\n@@'++++++++++++.............++++++++++++\n'''+++++++++''................,+####++++\n''++++#++++'..................,+####++++\n''++++#++++'..................,+####++++\n++++++++''''...................+++####++\n++++##++'''....................,++#####+\n++++++++'''.....................+++#####\n++++++++'''.....................+++#####\n++++++++''................#####.+++#####\n##++++++''..............###.....,,++####\n++++++++''.............###.   ..,,++####\n++++++++''.............###.   ..,,++####\n++++++++...#######....,...'@   ...,++++#\n++++++++..##..  ......,...    ....,+++++\n++++++++....''@   ....,,..........,+++++\n++++++++....''@   ....,,..........,+++++\n++++++++....    .......,...........#++++\n++++++++...............,,,.........#++++\n++++++++++..............,,.........#++++\n++++++++++..............,,.........#++++\n++++++++++..............,,,........#++++\n++++++++##............,...,.......,###++\n++++++++##+............,,,........,###++\n++++++++##+............,,,........,###++\n++++++++++#.......................##++++\n++++++++++##..........''''''....,,##++++\n++++++++++##.......'''''........,,##++++\n++++++++++##.......'''''........,,##++++\n++++++++##+###.................,++##++++\n++++++++####++................,;####++++\n++++++++++++##+.............,,;+###+++++\n++++++++++++##+.............,,;+###+++++\n++++++'++++++++:...........,::;+###+++++\n+++++++++++++++;::........,:::++###+++++\n++++++++++++++++..::::::::::##++##+###++\n++++++++++++++++..::::::::::##++##+###++\n++++''++##++++++..........,,,,++###+++++\n++++''++##+++++#...........,,,++++++++++\n++++++++++++++++...........,,,:+++++++++\n++++++++++++++++...........,,,:+++++++++\n++++++++++++++++##.........,,,,+++++++++\n''+++++++++++++###..........,,,:++++++++\n++++++++++++++#####...........,,,,++++++\n++++++++++++++#####...........,,,,++++++\n";
+    std::cout << "'''''''''''+++@@@@@@+++@@@@@@@++''''''''\n'''''''''''+++@@@@@@+++@@@@@@@++''''''''\n''''''''@@@@@@@+++++++++++++@@@@@@''''''\n''''''@@@@++++++++++++++++++++++@@@@''''\n''''@@@++++++++++++++++++++++++++++@''''\n''''@@@++++++++++++++++++++++++++++@''''\n'''@@@+++++++++++++++++++++++++++++@@@@'\n''@@++++++++++++++++++++++++++++++++++@@\n@@@++++++++++++'++.........'+++++++++++@\n@@@++++++++++++'++.........'+++++++++++@\n@@'++++++++++++.............++++++++++++\n'''+++++++++''................,+####++++\n''++++#++++'..................,+####++++\n''++++#++++'..................,+####++++\n++++++++''''...................+++####++\n++++##++'''....................,++#####+\n++++++++'''.....................+++#####\n++++++++'''.....................+++#####\n++++++++''................#####.+++#####\n##++++++''..............###.....,,++####\n++++++++''.............###.   ..,,++####\n++++++++''.............###.   ..,,++####\n++++++++...#######....,...'@   ...,++++#\n++++++++..##..  ......,...    ....,+++++\n++++++++....''@   ....,,..........,+++++\n++++++++....''@   ....,,..........,+++++\n++++++++....    .......,...........#++++\n++++++++...............,,,.........#++++\n++++++++++..............,,.........#++++\n++++++++++..............,,.........#++++\n++++++++++..............,,,........#++++\n++++++++##............,...,.......,###++\n++++++++##+............,,,........,###++\n++++++++##+............,,,........,###++\n++++++++++#.......................##++++\n++++++++++##..........''''''....,,##++++\n++++++++++##.......'''''........,,##++++\n++++++++++##.......'''''........,,##++++\n++++++++##+###.................,++##++++\n++++++++####++................,;####++++\n++++++++++++##+.............,,;+###+++++\n++++++++++++##+.............,,;+###+++++\n++++++'++++++++:...........,::;+###+++++\n+++++++++++++++;::........,:::++###+++++\n++++++++++++++++..::::::::::##++##+###++\n++++++++++++++++..::::::::::##++##+###++\n++++''++##++++++..........,,,,++###+++++\n++++''++##+++++#...........,,,++++++++++\n++++++++++++++++...........,,,:+++++++++\n++++++++++++++++...........,,,:+++++++++\n++++++++++++++++##.........,,,,+++++++++\n''+++++++++++++###..........,,,:++++++++\n++++++++++++++#####...........,,,,++++++\n++++++++++++++#####...........,,,,++++++\n";
   }
   else if( command == "EXIT" || command == "exit"){
     game_running = false;
   }
   else{
-    cout << command << " is not a valid command. Use HELP to view available commands.\n";
+    std::cout << command << " is not a valid command. Use HELP to view available commands.\n";
   }
 }
 
